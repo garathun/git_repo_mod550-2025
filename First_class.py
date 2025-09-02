@@ -29,13 +29,13 @@ class MyFirstClass:
         return list_of_numbers
     
     def random_numbers_in_two_dimensions(self, number_of_randoms):
-        
+
 
 
 cake = MyFirstClass(input1=42)
 cake.random_numbers(number_of_randoms=15)
 cake.random_numbers_in_two_dimensions(number_of_randoms=10)
 
-# First make a list of one dimensions of random numbers
+# First make a list of one dimensions of random numbers 
 # Homework, make a list of two dimension random number
 
