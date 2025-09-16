@@ -1,4 +1,5 @@
 # mod550-2025
+Made by Bård Garathun
 Repository for the class MOD550 Fundaments of Machine Learning for and with Engineering Applications
 
 Course description:
