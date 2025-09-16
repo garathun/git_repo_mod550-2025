@@ -189,7 +189,7 @@ class DataFromSource:
         plt.figure()
         plt.plot(centers, cdf)
         plt.title(f'CDF of Emissions – {self.country}')
-        plt.xlabel('Emission (bin center)')
+        plt.xlabel('Emission ')
         plt.ylabel('Cumulative probability')
         plt.ylim(0, 1.05)
         plt.grid()
