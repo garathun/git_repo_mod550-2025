@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 '''
-Project for MOD550
+Project 1 for MOD550 by Bård Garathun
 Divided up in tasks.
 Task 1: make a histogram from a 2d  random distribution
 Task 2: make a 2d heat map from a 2d random distribution
