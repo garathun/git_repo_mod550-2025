@@ -26,20 +26,14 @@ need to learn in general when you work with ML and in particular if you want to 
 PREPARE FOR BUT NOT DUE YET:  task 3: apply all this to your dataset (this will be part of the final task) 
 To submit, load on git your work and REPLY here with a comment: (e.g. 'Done)
 '''
-# import sys
-# import os
+
 import random
-# import sklearn.metrics as sk
 import numpy as np
 import matplotlib.pyplot as plt
-# import tensorflow as tf
-# from keras.models import Model
-# from keras.layers import Input
 from keras.layers import Dense
 from keras.regularizers import l2
 from keras.models import Sequential
 from keras.optimizers import Adam
-# from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
