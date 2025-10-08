@@ -41,17 +41,18 @@ class DataFromSource:
         :return: A pandas datafram with emissions for the input location.
         '''
         df = pd.read_csv('data/emission.csv') 
-        print(list(df)) # print the headers
+        # print(list(df)) # print the headers
         unique_locations = df['geo_label'].unique() # Find all unique locations in the dataframe
-        print(unique_locations)
+        #print(unique_locations)
         try:
             df = df[df['geo_label'] == self.country]
         except:
             print(f'Could not find data for location {self.country}...')
             return None
+        df.dropna(subset=['obs_value'], inplace=True)
         self.time =df['time'].to_numpy()
         self.emission = df['obs_value'].to_numpy()
-        return self.time, self.emission
+        return self.time, self.emission, unique_locations
 
     def plot_histogram(self):
         '''
