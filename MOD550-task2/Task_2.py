@@ -1,27 +1,19 @@
 
 '''
-Make a folder in your git MOD550-task2
-This is going to be a big assignment but it is the last from my part. You have one month of time to work on it.
-Inside the folder, put a Jupyter Notebook file  (.ipynb) for your Instances (cake) that you use to solve the task and one python file (.py) for your METHODS (recipes).
-note from task 1 discussion: If you have a lot of data, please add the necessary only. You can have a single folder in your repo called data and you can access it from each task. (e.g. if your code sits in the folder MOD550-task2, you can access to your data naming the different folder such as: filename = "../data/a_lot_of_number.csv"). You wont need your data for now on task2, but you will need it later on.
- 
-task 2.1: Make a DataModel class that reads the output of the DataAquisition class (from task1) in its __init__()
-task 2.2: Make a function in DataModel to make a linear regression. I suggest you try to do it on your own with only 
-vanilla python and the class notes. If you are lost, you can find practical info here on how to use already 
-made libraries:  https://www.geeksforgeeks.org/machine-learning/regularization-in-machine-learning/Lenker til en ekstern side.  
-The issue here will be data structure: np.array vs list of list vs pandas DataFrames.
-Can get help from Data_generation_and_classes in MOD550-fall-2025/notebooks
-task 2.3: Make a function that split the data you got from DataAquisition into train, validation and test. Do it  with vanilla
- python. You need to make sure you understand the data structure.
-task 2.4: Make a function that computes MSE (make your own, don't copy from my notes :P )
-task 2.5: Make a function to make NN. It would be essentially a wrapper of other libraries, I suggest to use Keras: 
- https://www.geeksforgeeks.org/machine-learning/how-to-create-models-in-keras/  . You should have acquired enough notions 
- to handle this tool.
-task 2.6: Make a function that does K_MEAN and GMM (we will discuss them next week)
-Once these methods (recipes) are done, you can now make cakes! :) :
-task 2.7: Make a linear regression on all your data (statistic ).
-task 2.8: Make a linear regression on all your train data and test it on your validation.
-task 2.9: Compute the MSE on your validation data. 
+Task 2 for MOD550 by Bård Garathun
+
+For task 2.7, 2.8 and 2.9, it looks like the dataset might cause a problem.
+Either because I don't see how I should handle the data to make the best use of it,
+or because it's too fragmented and the different fragments have a max lenght of 23.
+It give a hailstorm of lines when I do linear regression on each country to plot it together in a graph.
+But I cannot combine as that will just give several y values for each x value and therefore no added value.
+Can group together in larger categories than country, like east, west, north, south europe or similar,
+get mean/avg or other and use this to compare reginal differences? Or find a way to calculate the neighbouring difference
+based on location and distance.
+Anyway, I'm open for suggestions if I can use this dataset or if I should consider something else.
+
+
+
 task 2.10: Try for different distribution of initial data point, (a) Discuss how different functions can be used in the 
 linear regression, and different NN architecture. (b) Discuss how you can use the validation data for the different cases. 
 (c) Discuss the different outcome from the different models when using the full dataset to train and when you use a different
@@ -121,7 +113,7 @@ class DataModel:
         # print(y_pred)
         # return a, b, y_pred
 
-    def split_data(self, train = 0.6, val = 0.2, test = 0.2, RSEED=100):
+    def split_data(self, train = 0.6, val = 0.2, test = 0.2, RSEED=None):
         '''
         Task 2.3:
         Split the data you got from DataAquisition into train, validation and test. Using vanilla python
@@ -210,14 +202,14 @@ class DataModel:
         y_pred_nn = scaler_y.inverse_transform(y_pred_nn_scaled)
         return y_pred_nn, history_nn
     
-    def k_mean(self, n_clusters, rseed=42):
+    def k_mean(self, n_clusters, RSEED=None):
         '''
         Task 2.6: K_MEAN
         Make a function that does K_MEAN and GMM (we will discuss them next week)
         Performs K-Means clustering on the data
 
         :param n_clusters: The number of clusters (K) to find
-        :param rseed: The random seed for reproducibility
+        :param RSEED: The random seed for reproducibility
         :return labels: The cluster assignment for each data point
         :return model: The fitted KMeans model object
         '''
@@ -227,20 +219,20 @@ class DataModel:
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
         # Create and fit the K-Means model
-        kmeans_model = KMeans(n_clusters=n_clusters, random_state=rseed, n_init=10)
+        kmeans_model = KMeans(n_clusters=n_clusters, random_state=RSEED, n_init=10)
         kmeans_model.fit(X_scaled)
         # Get the cluster labels for each data point
         labels = kmeans_model.labels_
         print(f"\nK-Means found {len(np.unique(labels))} clusters")
         return labels, kmeans_model
     
-    def gmm(self, n_components, rseed=42):
+    def gmm(self, n_components, RSEED=None):
         '''
         Task 2.6: GMM
         Make a function that does K_MEAN and GMM
 
         :param n_components: The number of Gaussian distributions to model
-        :param rseed: The random seed for reproducibility
+        :param RSEED: The random seed for reproducibility
         :return labels: The cluster assignment for each data point
         :return model: The fitted GMM model object
         '''
@@ -250,7 +242,7 @@ class DataModel:
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
         # Create and fit the GMM
-        gmm_model = GaussianMixture(n_components=n_components, random_state=rseed)
+        gmm_model = GaussianMixture(n_components=n_components, random_state=RSEED)
         gmm_model.fit(X_scaled)
         # Get the cluster labels for each data point
         labels = gmm_model.predict(X_scaled)
@@ -273,6 +265,10 @@ class DataModel:
         for country in self.unique_locations:
             print(f"Processing: {country}")
             model = DataModel(country=country)
+            if len(model.x) < 6:
+                print(f'Skipping {country} due to insufficient data')
+                continue
+            a, b, y_pred = 0, 0, [] # Safety line for try block
             try:
                 a, b, y_pred = model.linear_regression(x= None, y= None)
             except ZeroDivisionError as e:
@@ -294,7 +290,8 @@ class DataModel:
         Calculates MSE for each country on validate data
         Uses linear_regression to make regression for each country
         Uses plot_all_country_regressions for plotting for each country
-        
+
+        :param RSEED: The random seed for reproducibility
         :return all_train_regression_results: A dictionary containing the regression results for each country
         x_train, y_train, y_pred_train, a_train, mse_val
         :return all_validation_results: A dictionary containing the MSE results for each country
@@ -306,10 +303,13 @@ class DataModel:
         for country in self.unique_locations:
             print(f"Processing: {country}")
             model = DataModel(country=country)
-            if len(model.x) < 4:
+            if len(model.x) < 6:
                 print(f'Skipping {country} due to insufficient data')
                 continue
-            x_train, y_train, x_val, y_val, x_test, y_test = model.split_data(train = 0.6, val = 0.2, test = 0.2, RSEED=100)
+            a_train, b_train, y_pred_train = 0, 0, [] # Safety line for try block
+            mse_val = 0
+            x_train, y_train, x_val, y_val, x_test, y_test = model.split_data(train = 0.6, val = 0.2, test = 0.2, RSEED=RSEED)
+             
             try:
                 a_train, b_train, y_pred_train = model.linear_regression(x_train, y_train)
             except ZeroDivisionError as e:
@@ -365,28 +365,6 @@ class DataModel:
         plt.tight_layout() # Adjusting plot to prevent labels from overlapping
         plt.show()
 
-    # def plot(self):
-    #     '''
-    #     Plotting values and predictions
-
-    #     :param self.x: Time value in years
-    #     :param self.y: Emission value in g CO2 per km
-    #     :param y_pred: predicted y values
-    #     :return: Returns a plot
-    #     '''
-    #     # plots
-    #     #plt.figure(figsize=(15, 12))
-    #     plt.suptitle(
-    #         f'Mean Squared Error: {mse}',
-    #         fontsize=10
-    #     )
-    #     plt.scatter(self.x, self.y, label ='All data')
-    #     plt.plot(self.x, y_pred, color='red', label='Fitted line')
-    #     plt.xlabel('X')
-    #     plt.ylabel('Y')
-    #     plt.legend()
-    #     plt.show()
-
     def plot_clusters(self, labels, model_name):
         '''
         Task 2.6:
@@ -412,14 +390,14 @@ class DataModel:
         '''
         Task 2.7, 2.8 and 2.9:
         Plots the linear regression lines for multiple countries on a single graph
-        It's completely shit now, but it will be improved upon when there is time
+
         TODO Figure out if checkboxes can be done in a live graph, prob use tkinter
 
         :param results_dict: A dictionary containing the regression results for each country
         x_train, y_train, y_pred_train, a_train, mse_val
         '''
         
-        plt.figure(figsize=(10, 7))
+        plt.figure(figsize=(14, 7))
         # Plots all the raw data points with some transparency
         for country, data in results_dict.items():
             plt.scatter(data['x'], data['y'], alpha=0.2, label=f'_{country} data') # Underscore hides from legend
@@ -434,7 +412,8 @@ class DataModel:
         plt.title('Linear Regression Comparison Across All Countries')
         plt.xlabel('Year')
         plt.ylabel('Emissions (g CO2 per km)')
-        plt.legend(loc='best', fontsize= 8)
+        plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize= 8)
+        plt.tight_layout(rect=[0, 0, 0.95, 1]) # Fitting ledend to the right side without dissapearing
         plt.grid(True, alpha=0.5)
         plt.show()
 
@@ -442,15 +421,18 @@ class DataModel:
 
 # The messy kitchen...
 
+# Starts by setting the RSEED to either None or 100 for checking code 
+RSEED = None
+
 # Task 2.1
 model = DataModel(country ='Sweden')
 
 # Task 2.2
 a, b, y_pred = model.linear_regression(x= None, y= None)
-model.split_data(train = 0.6, val = 0.2, test = 0.2, RSEED=100)
+model.split_data(train = 0.6, val = 0.2, test = 0.2, RSEED= RSEED)
 
 # Task 2.3
-x_train, y_train, x_val, y_val, x_test, y_test = model.split_data(train = 0.6, val = 0.2, test = 0.2, RSEED=100)
+x_train, y_train, x_val, y_val, x_test, y_test = model.split_data(train = 0.6, val = 0.2, test = 0.2, RSEED= RSEED)
 print('x_train', x_train, 'y_train', y_train, 'x_val', x_val, 'y_val', y_val, 'x_test', x_test, 'y_test', y_test)
 
 # Task 2.4
@@ -458,19 +440,20 @@ mse = model.mean_squared_error(predicted= y_pred)
 print("Mean Squared Error:", mse)
 
 # Task 2.5
-nn_y_pred, nn_history = model.neural_network(epochs=1200)
+nn_y_pred, nn_history = model.neural_network(epochs=600)
 model.plot_neural_network()
 
 # Task 2.6
+# K-Mean
 clusters = 5
-kmean_labels, kmean_model = model.k_mean(n_clusters=clusters)
+kmean_labels, kmean_model = model.k_mean(n_clusters=clusters, RSEED= RSEED)
 model.plot_clusters(kmean_labels, f'K-Means (K={clusters})')
 # GMM
-gmm_labels, gmm_model = model.gmm(n_components=clusters)
+gmm_labels, gmm_model = model.gmm(n_components=clusters, RSEED= RSEED)
 model.plot_clusters(gmm_labels, f'GMM (N={clusters})')
 
 # Task 2.7
 model.linear_regression_on_all_data()
 
 # Task 2.8 and 2.9
-model.LR_on_all_train_data(train = 0.6, val = 0.2, test = 0.2, RSEED=100)
+model.LR_on_all_train_data(train = 0.6, val = 0.2, test = 0.2, RSEED= RSEED)
