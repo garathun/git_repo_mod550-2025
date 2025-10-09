@@ -2,29 +2,63 @@
 '''
 Task 2 for MOD550 by Bård Garathun
 
+For task 2.5 I did not do splitting, validation and testing. Might be that I misunderstood the assignment.
+I just did the NN to make a better line than LR, if I should include splitting and validiation let me know and I'll fix.
 For task 2.7, 2.8 and 2.9, it looks like the dataset might cause a problem.
 Either because I don't see how I should handle the data to make the best use of it,
-or because it's too fragmented and the different fragments have a max lenght of 23.
-It give a hailstorm of lines when I do linear regression on each country to plot it together in a graph.
+or because it's too fragmented(countries) and the different fragments have a max lenght of 23.
+It gives a hailstorm of lines when I do linear regression on each country to plot it together in a graph.
 But I cannot combine as that will just give several y values for each x value and therefore no added value.
 Can group together in larger categories than country, like east, west, north, south europe or similar,
-get mean/avg or other and use this to compare reginal differences? Or find a way to calculate the neighbouring difference
+get mean/avg or other and use this to compare regional differences? Or find a way to calculate the neighbouring difference
 based on location and distance.
 Anyway, I'm open for suggestions if I can use this dataset or if I should consider something else.
 
 
 
-task 2.10: Try for different distribution of initial data point, (a) Discuss how different functions can be used in the 
-linear regression, and different NN architecture. (b) Discuss how you can use the validation data for the different cases. 
+Task 2.10:
+Try for different distribution of initial data point, 
+(a) Discuss how different functions can be used in the linear regression, and different NN architecture. 
+
+For this linear regression I've used a first order polynomial. This gives a straight curve. 
+But the data will not always allow a straight curve to match the data perfectly and a natural next step
+would be to use a second order polynomial function. 
+
+While tuning the training you can decide the depth (number of layers) and width (neurons per layer),
+here we can use the training data and check with the validate data to see if playing around with layers and neurons can give
+you a better MSE. A network with more layers and neurons will have more capacity to learn complex patterns
+and you need to consider the danger of overfitting. With a small dataset like I have, this is it a huge risk.
+
+
+(b) Discuss how you can use the validation data for the different cases. 
+Using validation data give you an unbiased estimate of the models performance.
+It can tell you which model is best suited for the dataset, ie. LR or NN? Is it "close" enought with LR and much less expensive?
+Can help you tune the NN, is the number of layers, neurons and the combination of those are the optimal choise, are the learning
+rate correct? Without validation data that will be a best guess estimate. It can be used for detecting overfitting.
+
+
 (c) Discuss the different outcome from the different models when using the full dataset to train and when you use a different
- ML approach. (d) Discuss the outcomes you get for K-means and GMM. (e) Discuss how you can integrate supervised and
- unsupervised methods for your case.
+ ML approach. 
+ When using the full dataset to train I only calculated MSE for the one country Sweden. I could implement it for the rest,
+ but chose not to as there are questions about whether or not keeping this set.
+ Anyway, the calculated MSE for the linear regression is 235.8 and is the representation on how well the straight line
+ matches the points. The number shows that there are some noise or outliers. For this perticular instance there are sudden
+ changes in the data that makes a linear regression not the best way to describe the data.
+When considering the MSE for Sweden on the linear regression for the whole set the value is: 235.8.
+For RSEED = 6 then the MSE for Sweden is 55.28, when setting the RSEED to 2, MSE = 545.21.
+This shows that this small dataset is sensitive due to the small number of validation where the outliers will have much larger
+impact than is the reality due to the random split. Due to this there is a need to smooth over the MSE for multiple
+splits to get a more trustworthy performase measurement. 
+
+
+ (d) Discuss the outcomes you get for K-means and GMM. 
+ On the input of making 3 clusters both categoriezes it into a high emission era, transition (with a hump) and the final
+ low era. The LR for k-Means would be more horizontal and GMM seems like a better and more natural fit to the data 
  
-Comment:  All previous tasks are made to make you arrive to do 2.10. This point is the core of the course and it is what you 
-need to learn in general when you work with ML and in particular if you want to pass the exam :P 
- 
-PREPARE FOR BUT NOT DUE YET:  task 3: apply all this to your dataset (this will be part of the final task) 
-To submit, load on git your work and REPLY here with a comment: (e.g. 'Done)
+
+ (e) Discuss how you can integrate supervised and unsupervised methods for your case.
+ Although my dataset is small, GMM shows that we can probably make better predictions using LR on the 3 clusters,
+ rather than the LR on all the years.
 '''
 
 import random
@@ -154,7 +188,7 @@ class DataModel:
         n = len(self.y)
         if n != len(predicted):
             raise ValueError('Predicted and real value list length must be the same')
-        error = 0 # Initiate variable
+        error = 0
         for i in range(n):
             error += (self.y[i] - predicted[i])**2
         mse = error / n
@@ -180,9 +214,11 @@ class DataModel:
         y_scaled = scaler_y.fit_transform(y_reshaped)
         # Define the neural network model
         model_nn = Sequential([
-            Dense(16, input_dim=1, activation='relu', kernel_regularizer=l2(0.001)),
-            Dense(32, activation= 'relu', kernel_regularizer = l2(0.001)),
-            Dense(64, activation= 'relu', kernel_regularizer = l2(0.001)),
+            Dense(1700, input_dim=1, activation='relu', kernel_regularizer=l2(0.001)),
+            # Dense(64, activation= 'relu', kernel_regularizer = l2(0.001)),
+            # Dense(64, activation= 'relu', kernel_regularizer = l2(0.001)),
+            # Dense(64, activation= 'relu', kernel_regularizer = l2(0.001)),
+            # Dense(64, activation= 'relu', kernel_regularizer = l2(0.001)),
             Dense (1) # Output layer without activation for linear regression
             ])
         # Compile the model
@@ -191,7 +227,6 @@ class DataModel:
         history_nn = model_nn.fit(x_scaled, y_scaled, epochs = epochs, verbose = 1)
         # Use the model for prediction
         y_pred_nn_scaled = model_nn.predict(x_scaled)
-        # INVERSE TRANSFORM THE PREDICTION
         # This converts the prediction from the 0-1 scale back to the original emission scale
         y_pred_nn = scaler_y.inverse_transform(y_pred_nn_scaled)
         return y_pred_nn, history_nn
@@ -259,7 +294,7 @@ class DataModel:
         for country in self.unique_locations:
             print(f"Processing: {country}")
             model = DataModel(country=country)
-            if len(model.x) < 6:
+            if len(model.x) < 10:
                 print(f'Skipping {country} due to insufficient data')
                 continue
             a, b, y_pred = 0, 0, [] # Safety line for try block
@@ -297,7 +332,7 @@ class DataModel:
         for country in self.unique_locations:
             print(f"Processing: {country}")
             model = DataModel(country=country)
-            if len(model.x) < 6:
+            if len(model.x) < 10:
                 print(f'Skipping {country} due to insufficient data')
                 continue
             a_train, b_train, y_pred_train = 0, 0, [] # Safety line for try block
@@ -313,8 +348,6 @@ class DataModel:
                 # Calculate MSE
                 mse_val = np.mean((np.array(y_val) - np.array(y_pred_validation))**2)
                 print(f"Validation MSE for {country}: {mse_val:.4f}")
-                # Store the result
-                all_validation_results[country] = mse_val
             else:
                 print(f"No validation data for {country} to calculate MSE.")
             # Store the results (original data and the prediction) in a dictionary
@@ -415,8 +448,9 @@ class DataModel:
 
 # The messy kitchen...
 
-# Starts by setting the RSEED to either None or 100 for checking code 
-RSEED = None
+
+# Starts by setting the RSEED to either None or "int value" for checking code 
+RSEED = 6
 
 # Task 2.1
 model = DataModel(country ='Sweden')
@@ -434,12 +468,12 @@ mse = model.mean_squared_error(predicted= y_pred)
 print("Mean Squared Error:", mse)
 
 # Task 2.5
-nn_y_pred, nn_history = model.neural_network(epochs=600)
+nn_y_pred, nn_history = model.neural_network(epochs=100)
 model.plot_neural_network()
 
 # Task 2.6
 # K-Mean
-clusters = 5
+clusters = 3
 kmean_labels, kmean_model = model.k_mean(n_clusters=clusters, RSEED= RSEED)
 model.plot_clusters(kmean_labels, f'K-Means (K={clusters})')
 # GMM
