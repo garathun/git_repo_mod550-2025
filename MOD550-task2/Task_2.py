@@ -234,7 +234,6 @@ class DataModel:
     def k_mean(self, n_clusters, RSEED=None):
         '''
         Task 2.6: K_MEAN
-        Make a function that does K_MEAN and GMM (we will discuss them next week)
         Performs K-Means clustering on the data
 
         :param n_clusters: The number of clusters (K) to find
@@ -258,7 +257,7 @@ class DataModel:
     def gmm(self, n_components, RSEED=None):
         '''
         Task 2.6: GMM
-        Make a function that does K_MEAN and GMM
+        Performs GMM clustering on the data
 
         :param n_components: The number of Gaussian distributions to model
         :param RSEED: The random seed for reproducibility
@@ -282,8 +281,6 @@ class DataModel:
         '''
         Task 2.7:
         Performs a linear regression on the data from each county
-        Uses linear_regression to make regression for each country
-        Uses plot_all_country_regressions for plotting for each country
 
         :return all_train_regression_results: A dictionary containing the regression results for each country
         x_train, y_train, y_pred_train, a_train, mse_val
@@ -317,8 +314,6 @@ class DataModel:
         Task 2.8 & 2.9
         Performs a linear regression on the data from each county on train data
         Calculates MSE for each country on validate data
-        Uses linear_regression to make regression for each country
-        Uses plot_all_country_regressions for plotting for each country
 
         :param RSEED: The random seed for reproducibility
         :return all_train_regression_results: A dictionary containing the regression results for each country
@@ -327,7 +322,6 @@ class DataModel:
         '''
 
         all_train_regression_results = {}
-        all_validation_results = {}
 
         for country in self.unique_locations:
             print(f"Processing: {country}")
@@ -372,14 +366,14 @@ class DataModel:
         '''
 
         plt.figure(figsize=(14, 6))
-        # Plot 1: Training Loss
+        # Training Loss
         plt.subplot(1, 2, 1)
         plt.plot(nn_history.history['loss'])
         plt.title('Model Loss During Training')
         plt.xlabel('Epoch')
         plt.ylabel('Loss')
         plt.grid(True)
-        # Plot 2: Model Predictions
+        # Model Predictions
         plt.subplot(1, 2, 2)
         plt.scatter(self.x, self.y, label='Original Data')
         plt.plot(self.x, y_pred, color='red', linewidth=2, label='Linear Regression')
