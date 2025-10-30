@@ -1,0 +1,30 @@
+
+Readme.md: Ok on course descirption, but you should also say something about yourself and your repo (shortly) to guide me in it.
+
+Task 1: Good!
+Task 2: Good!
+Task 3: Good!
+Task 4: Good!
+Task 5: Yes, splitting is imp to calculate the model prediction ability.
+Task 6: Good!
+Task 7: Good!
+Task 8: Good!
+Task 9: Good!
+
+Task 10 a: Agree.
+Task 10 b: You mixed up validation and test definition.
+Task 10 c: statistic and overfitting!
+Task 10 d: you need to try different cluster number and approaches to find the minimum. Try on make uyp data first!
+Task 10 e: 'probably better' is not a scientific argument.
+
+Comment:
+========
+
+python : use pylint for detailed suggstions, overall it is good. Good docstring also.
+    
+Jupyter notebook: not there? Please prepare one to help me process iand visualize the outcomes. Your python program is good and compensate for it, but generally it is nice to not force an external (me in this case) to enter in your cource code. If you want to keep all on .py ok, but then you would need at least to split in a recepited and a cake file (method and instancea). That would increase a lot the clarity of your code and, I am sure, also your speed.
+
+Notes: repo structure is messy. MOD550-task2 folder contains Task1 and Task2...
+Good job, my remarks are something mino. To prepare for the exam, use your library with more complicated truth functions to generate data. Also you might want to generate data from multimodal distributions.
+In this task you were suppoused to work on MAKE UP DATA first, Project 3 was on your dataset, but I want you to be patient and TRAIN yourself a bit more on these TEST data before to take advantage of the VALIDATION of your tools/understanding ;)
+
